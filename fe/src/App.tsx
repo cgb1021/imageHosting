@@ -17,6 +17,7 @@ function App() {
         >
           Learn React
         </a>
+        typescript support.
       </header>
     </div>
   );
