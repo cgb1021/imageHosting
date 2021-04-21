@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const token = require('../utils/token');
 
-/* GET home page. */
+/* 公共api */
 router.get('/test', function(req, res, next) {
-  res.json({ name: 'test', pass: token.verify(req.query.token) })
+  res.json({ name: 'test' })
 });
 
 module.exports = router;

@@ -6,8 +6,10 @@ const logger = require('morgan');
 const helmet = require('helmet');
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const userRouter = require('./routes/user');
 const apiRouter = require('./routes/api');
+const apiv1Router = require('./routes/apiv1');
+const apiv2Router = require('./routes/apiv2');
 
 const siteConfig = require('./config/site');
 
@@ -30,7 +32,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/user', userRouter);
+app.use('/api/v1', apiv1Router);
+app.use('/api/v2', apiv2Router);
 app.use('/api', apiRouter);
 
 app.use(express.static(path.join(__dirname, 'client/build')));
