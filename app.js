@@ -4,6 +4,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const helmet = require('helmet');
+const FileStreamRotator = require('file-stream-rotator');
+const fs = require('fs');
 
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
@@ -13,6 +15,7 @@ const apiv2Router = require('./routes/apiv2');
 
 const siteConfig = require('./config/site');
 
+const isProduction = process.env.NODE_ENV === 'production'
 const app = express();
 
 app.locals.__server = {
@@ -23,10 +26,20 @@ app.locals.title = siteConfig.title;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-if (process.env.NODE_ENV === 'production') {
+if (isProduction) {
   app.use(helmet());
+  const logDirectory = path.join(__dirname, 'log');
+  fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+  const accessLogStream = FileStreamRotator.getStream({
+    date_format: 'YYYYMMDD',
+    filename: path.join(logDirectory, 'access-%DATE%.log'),
+    frequency: 'daily',
+    verbose: false
+  })
+  app.use(logger('combined', {stream: accessLogStream}))
+} else {
+  app.use(logger('dev'));
 }
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
