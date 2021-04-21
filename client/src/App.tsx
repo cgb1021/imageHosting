@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 function App() {
   useEffect(() => {
-    fetch(`/api/test`).then((res) => {
+    fetch(`/api/test?token=${window?.__server.token}`).then((res) => {
       console.log(res)
     })
   })

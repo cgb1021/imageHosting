@@ -19,18 +19,22 @@
   "private": true,
   "scripts": {
     "start": "cross-env PORT=3001 node ./bin/www",
-    "dev": "concurrently --kill-others \"npm start\" \"cd client && npm start\""
+    "devstart": "cross-env PORT=3001 nodemon ./bin/www",
+    "dev": "concurrently --kill-others \"npm run devstart\" \"cd client && npm start\""
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "ejs": "^3.1.6",
     "express": "~4.16.1",
+    "helmet": "^4.5.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1"
   },
   "devDependencies": {
     "concurrently": "^6.0.2",
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "nodemon": "^2.0.7"
   }
 }
