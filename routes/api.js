@@ -3,7 +3,7 @@ const router = express.Router();
 
 /* 公共api */
 router.get('/test', function(req, res, next) {
-  res.json({ name: 'test' })
+  res.json({ code: 0, name: 'test' });
 });
 
 module.exports = router;

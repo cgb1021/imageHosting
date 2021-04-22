@@ -17,6 +17,7 @@ exports.verify = (code, salt = '') => {
       if (arr[0].length === String(time).length && arr[1].length === 32) {
         const last = +arr[0];
         const expires = +arr[2];
+        // console.log(expires, last, last + expires * 1000, time)
         if (!expires || last + expires * 1000 > time) {
           return code === create(last, expires, salt);
         }

@@ -18,7 +18,7 @@
   "homepage": "https://github.com/cgb1021/imageHosting#readme",
   "private": true,
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --timeout 5000",
     "start": "cross-env NODE_ENV=production node ./bin/www",
     "devstart": "cross-env NODE_ENV=development PORT=3001 nodemon ./bin/www",
     "dev": "concurrently --kill-others \"npm run devstart\" \"cd client && npm start\""
@@ -32,7 +32,9 @@
     "helmet": "^4.5.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
-    "morgan": "~1.9.1"
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "~1.9.1",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "chai": "^4.3.4",
