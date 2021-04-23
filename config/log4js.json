@@ -16,6 +16,13 @@
       "pattern": ".yyyy-MM-dd",
       "keepFileExt": true,
       "alwaysIncludePattern": true
+    },
+    "database": {
+      "type": "dateFile",
+      "filename": "logs/db.log",
+      "pattern": ".yyyy-MM-dd",
+      "keepFileExt": true,
+      "alwaysIncludePattern": true
     }
   },
   "categories": {
@@ -36,6 +43,13 @@
       "appenders": [
         "console",
         "user"
+      ],
+      "level": "info"
+    },
+    "mysql": {
+      "appenders": [
+        "console",
+        "database"
       ],
       "level": "info"
     }

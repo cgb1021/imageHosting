@@ -1,11 +1,36 @@
 const jwt = require('jsonwebtoken');
 const security = require('../config/security');
-const logger = require('../utils/logger').getLogger('user')
+const logger = require('../utils/logger').getLogger('user');
+const mysql = require('../utils/mysql');
+const crypto = require('crypto');
 const userStruct = {
   id: 0,
   name: ''
 }
 
+const createPassword = (password, id) => {
+  const md5 = crypto.createHash('md5');
+  return md5.update(`${password}${id}`).digest('hex');
+}
+exports.login = async (name, password) => {
+  let conn;
+  let user = false;
+  try {
+    conn = await mysql.connect();
+    const res = await mysql.query('select `id`,`name`,`password`,`nick` from `user` where `name`=? limit 1', conn, name);
+    if (res.length && res[0].password && createPassword(password, res[0].id) === res[0].password) {
+      user = {
+        id: res[0].id,
+        name: res[0].name,
+        nick: res[0].nick
+      }
+    }
+  } catch (e) {
+    logger.info(`login:${name} - ${e.message}`);
+  }
+  mysql.release(conn);
+  return user;
+}
 exports.verifyToken = (token, obj, user) => {
   if (!token || !obj || typeof obj !== 'object') return;
   jwt.verify(token, `${obj.id}${security.jwtsalt}`, (err, decoded) => {

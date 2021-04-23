@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('../utils/mysql');
+const user = require('../controllers/user');
 
 /* GET users listing. */
-router.get('/', (req, res, next) => {
-  res.send('respond with a resource');
-});
+router.post('/login', user.login);
 
 module.exports = router;

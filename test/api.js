@@ -14,7 +14,8 @@ describe('API', function() {
       })
       .then((res) => {
         assert.strictEqual(res.code, 0);
-        done()
+        assert.strictEqual(res.ping, 1);
+        done();
       })
     })
   })
@@ -27,7 +28,7 @@ describe('API', function() {
       })
       .then((res) => {
         assert.strictEqual(res.code, 403);
-        done()
+        done();
       })
     })
     it('带错误的token', function(done) {
@@ -38,7 +39,7 @@ describe('API', function() {
       })
       .then((res) => {
         assert.strictEqual(res.code, 403);
-        done()
+        done();
       })
     })
     it('带正确的token', function(done) {
@@ -50,7 +51,7 @@ describe('API', function() {
       })
       .then((res) => {
         assert.strictEqual(res.code, 0);
-        done()
+        done();
       })
     })
     it('token超时', function(done) {
@@ -88,7 +89,7 @@ describe('API', function() {
       })
       .then((res) => {
         assert.strictEqual(res.code, 403);
-        done()
+        done();
       })
     })
     it('带uid带token', function(done) {
@@ -107,7 +108,7 @@ describe('API', function() {
       .then((res) => {
         assert.strictEqual(res.code, 0);
         assert.deepEqual(res.user, testUser);
-        done()
+        done();
       })
     })
     it('带uid带token超时', function(done) {
@@ -126,7 +127,7 @@ describe('API', function() {
         })
         .then((res) => {
           assert.strictEqual(res.code, 403);
-          done()
+          done();
         })
       }, 1200)
     })

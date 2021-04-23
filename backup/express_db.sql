@@ -43,7 +43,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `name`, `password`, `nick`, `email`, `create_time`, `login_time`, `update_time`) VALUES
-(999, 'test', '8d54d2587e4e23acd4aebaabcf8665ee3', 'dGVzdA==', 'test@c.gb', '1982-10-21 00:00:00', '1982-10-21 00:00:00', '2021-04-23 05:54:38'),
+(999, 'test', '93327f2856df1105a1318895ac44e684', 'dGVzdA==', 'test@c.gb', '1982-10-21 00:00:00', '1982-10-21 00:00:00', '2021-04-23 05:54:38'),
 (1000, 'admin', '8d54d2587e4e23acd4aebaabcf8665ee3', '566h55CG5ZGY', '48838096@qq.com', '2016-03-25 10:31:28', '2017-06-26 01:42:47', '2017-06-25 01:42:47');
 
 --
