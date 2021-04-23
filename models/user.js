@@ -15,6 +15,7 @@ const createPassword = (password, id) => {
 exports.login = async (name, password) => {
   let conn;
   let user = false;
+  if (!name || !password) return user;
   try {
     conn = await mysql.connect();
     const res = await mysql.query('select `id`,`name`,`password`,`nick` from `user` where `name`=? limit 1', conn, name);
@@ -50,7 +51,6 @@ exports.verifyToken = (token, obj, user) => {
           }
         }
       }
-      
     }
   });
 }

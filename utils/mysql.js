@@ -34,7 +34,7 @@ exports.query = (sql, conn, values) => {
   })
 }
 exports.connect = (cb) => {
-  if (typeof cb == "function") {
+  if (typeof cb === "function") {
     pool.getConnection(function (err, connection) {
       if (err) {
         logger.error(err.message ? err.message : 'pool.getConnection error');

@@ -6,14 +6,15 @@ const mysql = require('../utils/mysql');
 router.get('/test', async (req, res, next) => {
   let ping = 0;
   let msg = '';
+  let conn
   try {
-    const conn = await mysql.connect();
+    conn = await mysql.connect();
     await mysql.ping(conn);
-    mysql.release(conn);
     ping = 1;
   } catch (e) {
     if (e.message) msg = e.message;
   }
+  mysql.release(conn);
 
   res.json({ code: 0, name: 'test', ping, msg });
 });
