@@ -6,6 +6,7 @@ const logger = require('morgan');
 const helmet = require('helmet');
 const FileStreamRotator = require('file-stream-rotator');
 const fs = require('fs');
+const env = require('./config/env');
 
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
@@ -15,7 +16,6 @@ const apiv2Router = require('./routes/apiv2');
 
 const siteConfig = require('./config/site');
 
-const isProduction = process.env.NODE_ENV === 'production'
 const app = express();
 
 app.locals.__server = {
@@ -26,9 +26,9 @@ app.locals.title = siteConfig.title;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-if (isProduction) {
+if (env.isProduction) {
   app.use(helmet());
-  const logDirectory = path.join(__dirname, 'log');
+  const logDirectory = path.join(__dirname, 'logs');
   fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
   const accessLogStream = FileStreamRotator.getStream({
     date_format: 'YYYYMMDD',
@@ -54,12 +54,12 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

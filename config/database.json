@@ -1,0 +1,28 @@
+{
+  "dev": {
+    "mysql": {
+      "host": "127.0.0.1",
+      "user": "express_dev",
+      "password": "express_dev",
+      "database": "express_db",
+      "port": 3306,
+      "connectionLimit": 50,
+      "acquireTimeout": 10000,
+      "charset": "utf8",
+      "prefix": ""
+    }
+  },
+  "production": {
+    "mysql": {
+      "host": "127.0.0.1",
+      "user": "express_dev",
+      "password": "express_dev",
+      "database": "express_db",
+      "port": 3306,
+      "connectionLimit": 50,
+      "acquireTimeout": 10000,
+      "charset": "utf8",
+      "prefix": ""
+    }
+  }
+}

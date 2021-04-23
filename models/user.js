@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const security = require('../config/security');
+const logger = require('../utils/logger').getLogger('user')
 const userStruct = {
   id: 0,
   name: ''
@@ -9,7 +10,7 @@ exports.verifyToken = (token, obj, user) => {
   if (!token || !obj || typeof obj !== 'object') return;
   jwt.verify(token, `${obj.id}${security.jwtsalt}`, (err, decoded) => {
     if (err) {
-      console.log(err.message);
+      logger.info(`id:${obj.id} - ${err.message}`);
       return;
     }
     if (user && typeof user === 'object') {

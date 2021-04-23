@@ -1,0 +1,43 @@
+{
+  "appenders": {
+    "console": {
+      "type": "console"
+    },
+    "debug": {
+      "type": "dateFile",
+      "filename": "logs/debug.log",
+      "pattern": ".yyyy-MM-dd",
+      "keepFileExt": true,
+      "alwaysIncludePattern": true
+    },
+    "user": {
+      "type": "dateFile",
+      "filename": "logs/user.log",
+      "pattern": ".yyyy-MM-dd",
+      "keepFileExt": true,
+      "alwaysIncludePattern": true
+    }
+  },
+  "categories": {
+    "default": {
+      "appenders": [
+        "console"
+      ],
+      "level": "info"
+    },
+    "debug": {
+      "appenders": [
+        "console",
+        "debug"
+      ],
+      "level": "debug"
+    },
+    "user": {
+      "appenders": [
+        "console",
+        "user"
+      ],
+      "level": "info"
+    }
+  }
+}
