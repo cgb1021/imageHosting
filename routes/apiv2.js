@@ -14,18 +14,21 @@ router.get('/:uid/*', function(req, res, next) {
   if (!uid || !/^\d+$/.test(uid) || !token) {
     return fn403();
   }
-  res.locals.user = { id: 0 };
-  user.verifyToken({
+  req.user = { id: 0 };
+  user.verifyToken(token, {
     id: uid,
     name
-  }, token, res.locals.user);
-  if (uid !== res.locals.user.id) {
+  }, req.user);
+  if (uid !== req.user.id) {
     return fn403();
   }
+  Object.defineProperty(req, 'user', {
+    writable: false
+  })
   next();
 });
 router.get('/:uid/test', function(req, res, next) {
-  res.json({ code: 0, name: 'v2_test', user: res.locals.user })
+  res.json({ code: 0, name: 'v2_test', user: req.user })
 });
 
 module.exports = router;
