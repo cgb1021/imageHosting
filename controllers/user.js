@@ -12,7 +12,7 @@ exports.login = async (req, res) => {
   let loginUser = null;
   let msg = '';
   try {
-    const result = await user.login(req.body.name, req.body.pwd);
+    const result = await user.login(req.body.name.trim(), req.body.pwd.trim());
     if (result) {
       loginUser = {
         id: result.id,
