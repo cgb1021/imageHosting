@@ -16,7 +16,7 @@ router.get('/test', async (req, res, next) => {
   }
   mysql.release(conn);
 
-  res.json({ code: 0, name: 'test', ping, msg });
+  res.json({ code: 0, time: new Date().toISOString(), ping, msg });
 });
 
 module.exports = router;
