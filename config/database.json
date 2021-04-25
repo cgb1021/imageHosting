@@ -9,7 +9,8 @@
       "connectionLimit": 50,
       "acquireTimeout": 10000,
       "charset": "utf8",
-      "prefix": ""
+      "prefix": "",
+      "timezone": "+08:00"
     }
   },
   "production": {
@@ -22,7 +23,8 @@
       "connectionLimit": 50,
       "acquireTimeout": 10000,
       "charset": "utf8",
-      "prefix": ""
+      "prefix": "",
+      "timezone": "+08:00"
     }
   }
 }

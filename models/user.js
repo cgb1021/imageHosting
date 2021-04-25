@@ -9,15 +9,16 @@ const createPassword = (password, id) => {
   const md5 = crypto.createHash('md5');
   return md5.update(`${password}${id}`).digest('hex');
 }
+
 exports.create = async (info) => {
   let conn;
   let id = 0;
   if (info && info.name && info.password) {
     try {
       conn = await mysql.connect();
-      const res = await mysql.query('insert into ' + tableName + ' (`name`,`password`,`email`,`nick`) values (?, ?, ?, ?)', conn, [
+      const res = await mysql.query('insert into ' + tableName + ' (`name`,`password`,`email`,`nick`,`create_time`,`login_time`) values (?,?,?,?,now(),now())', conn, [
         info.name,
-        Date.now(),
+        info.password,
         info.email,
         info.nick
       ]);
@@ -26,7 +27,7 @@ exports.create = async (info) => {
         await mysql.query('update ' + tableName + ' set `password`=? where `id`=' + id + ' limit 1', conn, createPassword(info.password, id));
       }
     } catch (e) {
-      logger.info(`login:${info.name} - ${e.message}`);
+      logger.info(`create:${info.name} - ${e.message}`);
     }
     mysql.release(conn);
   }
@@ -38,10 +39,12 @@ exports.login = async (name, password) => {
   if (!name || !password) return user;
   try {
     conn = await mysql.connect();
-    const res = await mysql.query('select `id`,`name`,`password`,`nick` from `user` where `name`=? limit 1', conn, name);
+    const res = await mysql.query('select `id`,`name`,`password`,`nick` from ' + tableName + ' where `name`=? limit 1', conn, name);
     if (res.length && res[0].password && createPassword(password, res[0].id) === res[0].password) {
+      const id = res[0].id;
+      await mysql.query('update ' + tableName + ' set `login_time`=now() where `id`=' + id + ' limit 1', conn);
       user = {
-        id: res[0].id,
+        id,
         name: res[0].name,
         nick: res[0].nick
       }
@@ -51,6 +54,20 @@ exports.login = async (name, password) => {
   }
   mysql.release(conn);
   return user;
+}
+exports.edit = async (id, password) => {
+  let conn;
+  let result = false;
+  if (!id || !password) return false;
+  try {
+    conn = await mysql.connect();
+    const res = await mysql.query('update ' + tableName + ' set `password`=? where `id`=? limit 1', conn, [createPassword(password, id), id]);
+    result = !!(res && res.changedRows === 1);
+  } catch (e) {
+    logger.info(`edit:${id} - ${e.message}`);
+  }
+  mysql.release(conn);
+  return result;
 }
 exports.verifyToken = (token, user, cb) => {
   if (!token || !user || typeof user !== 'object') return;

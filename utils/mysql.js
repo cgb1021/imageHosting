@@ -5,6 +5,10 @@ const config = require('../config/database')[env.isProduction ? 'production' : '
 
 const pool = mysql.createPool(config);
 
+exports.datetime = () => {
+  const zone = 8;
+  return new Date(+new Date() + zone * 3600 * 1000).toISOString();
+}
 exports.ping = (conn) => {
   return new Promise((resolve, reject) => {
     if (!conn) {

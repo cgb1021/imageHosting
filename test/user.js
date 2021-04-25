@@ -1,9 +1,14 @@
 const assert = require('chai').assert;
 const fetch = require("node-fetch");
 const token = require('../utils/token');
+const user = require('../models/user');
 const url = 'http://localhost:3001';
 const headers = {
-  'Content-Type': 'application/x-www-form-urlencoded'
+  "Content-Type": "application/x-www-form-urlencoded"
+}
+const testUser = {
+  id: 999,
+  name: 'test'
 }
 
 describe('User', function() {
@@ -209,5 +214,55 @@ describe('User', function() {
         })
     })
   })
-  describe('#edit', function() {})
+  describe('#edit', function() {
+    it('正常编辑', function(done) {
+      const code = user.createToken(testUser, 1);
+      const headers = {
+        "x-access-token": code,
+        "Content-Type": "application/x-www-form-urlencoded"
+      }
+      fetch(`${url}/user/${testUser.id}/edit`, {
+        method: 'PUT',
+        headers,
+        body: "pwd=test1"
+      })
+        .then((res) => {
+          assert.strictEqual(res.status, 200);
+          return res.json();
+        })
+        .then((res) => {
+          assert.strictEqual(res.code, 0);
+          assert.isTrue(res.result);
+          done();
+        })
+    })
+  })
+  describe('#logout', function() {
+    it('正常退出', function(done) {
+      const code = user.createToken(testUser, 1);
+      const headers = {
+        "x-access-token": code,
+        "x-access-name": testUser.name
+      }
+      fetch(`${url}/user/${testUser.id}/logout`, {
+        headers
+      })
+        .then((res) => {
+          assert.strictEqual(res.status, 200);
+          const cookieStr = res.headers.get('set-cookie');
+          const hasUId = /\bu_id=[^,]+?Expires=[^,]+?,[^,]+?HttpOnly/.test(cookieStr);
+          const hasUToken = /\bu_tk=[^,]+?Expires=[^,]+?,[^,]+?HttpOnly/.test(cookieStr);
+          const match = cookieStr.match(/Expires=([^;]+)/);
+          const time = new Date() - new Date(match[1]);
+          assert.strictEqual(Math.floor(time / (24 * 3600 * 1000)), 7);
+          assert.isTrue(hasUToken);
+          assert.isTrue(hasUId);
+          return res.json();
+        })
+        .then((res) => {
+          assert.strictEqual(res.code, 0);
+          done();
+        })
+    })
+  })
 });
