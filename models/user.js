@@ -3,14 +3,34 @@ const security = require('../config/security');
 const logger = require('../utils/logger').getLogger('user');
 const mysql = require('../utils/mysql');
 const crypto = require('crypto');
-const userStruct = {
-  id: 0,
-  name: ''
-}
 
+const tableName = '`user`'
 const createPassword = (password, id) => {
   const md5 = crypto.createHash('md5');
   return md5.update(`${password}${id}`).digest('hex');
+}
+exports.create = async (info) => {
+  let conn;
+  let id = 0;
+  if (info && info.name && info.password) {
+    try {
+      conn = await mysql.connect();
+      const res = await mysql.query('insert into ' + tableName + ' (`name`,`password`,`email`,`nick`) values (?, ?, ?, ?)', conn, [
+        info.name,
+        Date.now(),
+        info.email,
+        info.nick
+      ]);
+      if (res && res.affectedRows === 1) {
+        id = res.insertId;
+        await mysql.query('update ' + tableName + ' set `password`=? where `id`=' + id + ' limit 1', conn, createPassword(info.password, id));
+      }
+    } catch (e) {
+      logger.info(`login:${info.name} - ${e.message}`);
+    }
+    mysql.release(conn);
+  }
+  return id;
 }
 exports.login = async (name, password) => {
   let conn;

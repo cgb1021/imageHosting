@@ -164,6 +164,50 @@ describe('User', function() {
         })
     })
   })
-  describe('#signup', function() {})
+  describe('#signup', function() {
+    it('正常注册', function(done) {
+      const code = token.create();
+      fetch(`${url}/user/reg?_tk=${code}`, {
+        method: 'POST',
+        headers,
+        body: `name=test${Math.floor(Date.now() / 1000)}&pwd=test`
+      })
+        .then((res) => {
+          const cookieStr = res.headers.get('set-cookie');
+          const hasUToken = /\bu_tk=\w{36}[^,]+?Expires=[^,]+?,[^,]+?HttpOnly,/.test(cookieStr);
+          const hasUId = /\bu_id=\d{3,}[^,]+?Expires=[^,]+?,[^,]+?HttpOnly,/.test(cookieStr);
+          const hasUName = /\bu_name=\w+/.test(cookieStr);
+          assert.isTrue(hasUToken);
+          assert.isTrue(hasUName);
+          assert.isTrue(hasUId);
+          assert.strictEqual(res.status, 200);
+          return res.json();
+        })
+        .then((res) => {
+          assert.strictEqual(res.code, 0);
+          assert.isString(res.token);
+          assert.isObject(res.user);
+          done();
+        })
+    })
+    it('重复用户名', function(done) {
+      const code = token.create();
+      fetch(`${url}/user/reg?_tk=${code}`, {
+        method: 'POST',
+        headers,
+        body: `name=test&pwd=test`
+      })
+        .then((res) => {
+          assert.strictEqual(res.status, 200);
+          return res.json();
+        })
+        .then((res) => {
+          assert.strictEqual(res.code, 0);
+          assert.isNotString(res.token);
+          assert.isNotObject(res.user);
+          done();
+        })
+    })
+  })
   describe('#edit', function() {})
 });
