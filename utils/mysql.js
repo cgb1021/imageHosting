@@ -6,8 +6,7 @@ const config = require('../config/database')[env.isProduction ? 'production' : '
 const pool = mysql.createPool(config);
 
 exports.datetime = () => {
-  const zone = 8;
-  return new Date(+new Date() + zone * 3600 * 1000).toISOString();
+  return new Date().toLocaleString('zh', { hour12: false });
 }
 exports.ping = (conn) => {
   return new Promise((resolve, reject) => {
