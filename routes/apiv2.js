@@ -11,14 +11,23 @@ router.get('/:uid/*', (req, res, next) => {
   const uid = +req.params.uid;
   const token = req.cookies.u_tk || req.headers['x-access-token'];
   const name = req.cookies.u_name || req.headers['x-access-name'];
+  const userInfo = {
+    id: uid,
+    name
+  }
   if (!uid || !/^\d+$/.test(uid) || !token) {
     return fn403();
   }
   req.user = { id: 0 };
-  user.verifyToken(token, {
-    id: uid,
-    name
-  }, req.user);
+  user.verifyToken(token, userInfo, (err) => {
+    if (err) return;
+    for (const k in userInfo) {
+      req.user[k] = userInfo[k];
+      Object.defineProperty(req.user, k, {
+        writable: false
+      })
+    }
+  })
   if (uid !== req.user.id) {
     return fn403();
   }

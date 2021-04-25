@@ -56,6 +56,7 @@ describe('Token', function() {
       }, 1000)
     });
     it('2秒有效期用3秒超时检查不通过', function(done) {
+      this.timeout(3000);
       const code2 = token.create(2);
       setTimeout(() => {
         const b = token.verify(code2);

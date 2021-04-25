@@ -12,13 +12,22 @@ exports.login = async (req, res) => {
   let loginUser = null;
   let msg = '';
   try {
-    const result = await user.login(req.body.name.trim(), req.body.pwd.trim());
+    const name = req.body.name.trim();
+    const password = req.body.pwd.trim();
+    if (!/^\w+$/.test(name)) {
+      throw new Error('no name');
+    }
+    if (!password) {
+      throw new Error('no password');
+    }
+    const result = await user.login(name, password);
     if (result) {
       loginUser = {
         id: result.id,
         name: result.name
       }
-      const expires = 14 * 24 * 60 * 60;
+      const defaultExpires = 14 * 24 * 60 * 60;
+      const expires = req.query.expires && /^\d+$/.test(req.query.expires) ? Math.min(defaultExpires, Math.max(req.query.expires|0, 0)) : defaultExpires;
       const domain = env.isProduction ? siteConfig.domain : 'localhost';
       userToken = user.createToken(Object.assign({}, loginUser), expires);
       loginUser.nick = result.nick;
