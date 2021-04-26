@@ -1,7 +1,7 @@
 var cookie = require('cookie');
 exports.parse = (str) => {
   const cookies = {};
-  let tmp = str.split(/(?<!xpires=\w+),\s*/g);
+  let tmp = str.split(/(?<!\bExpires=\w+),\s*/g);
   tmp.forEach((str) => {
     const arr = str.split(/\s*;\s*/g);
     let name, value, domain, path, expires, http, secure;

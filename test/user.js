@@ -20,7 +20,9 @@ const testLoginSuccess = (step, cookies, res, name) => {
     assert.isObject(res.user);
     assert.strictEqual(res.user.name, name);
     assert.strictEqual(cookies.u_name.value, name);
+    assert.isNumber(res.user.id);
     assert.equal(res.user.id, cookies.u_id.value);
+    assert.isString(res.user.nick);
   } else {
     assert.strictEqual(res.status, 200);
     const hasUToken = typeof cookies['u_tk'] !== 'undefined';
@@ -226,6 +228,22 @@ describe('User', function() {
           done();
         })
     })
+    it('token错误', function(done) {
+      const code = token.create();
+      fetch(`${url}/user/reg?_tk=1${code}`, {
+        method: 'POST',
+        headers,
+        body: "name=test&pwd=test"
+      })
+        .then((res) => {
+          assert.strictEqual(res.status, 200);
+          return res.json();
+        })
+        .then((res) => {
+          assert.strictEqual(res.code, 403);
+          done();
+        })
+    })
   })
   describe('#edit', function() {
     it('正常编辑', function(done) {
@@ -237,7 +255,7 @@ describe('User', function() {
       fetch(`${url}/user/${testUser.id}/edit`, {
         method: 'PUT',
         headers,
-        body: "pwd=test1"
+        body: "oldpwd=test&pwd=test1"
       })
         .then((res) => {
           assert.strictEqual(res.status, 200);
@@ -246,6 +264,43 @@ describe('User', function() {
         .then((res) => {
           assert.strictEqual(res.code, 0);
           assert.isTrue(res.result);
+          done();
+        })
+    })
+    it('旧密码不正确', function(done) {
+      const code = user.createToken(testUser, 1);
+      const headers = {
+        "x-access-token": code,
+        "Content-Type": "application/x-www-form-urlencoded"
+      }
+      fetch(`${url}/user/${testUser.id}/edit`, {
+        method: 'PUT',
+        headers,
+        body: "oldpwd=test123456&pwd=test1"
+      })
+        .then((res) => {
+          assert.strictEqual(res.status, 200);
+          return res.json();
+        })
+        .then((res) => {
+          assert.strictEqual(res.code, 0);
+          assert.isFalse(res.result);
+          done();
+        })
+    })
+    it('token错误', function(done) {
+      const code = token.create();
+      fetch(`${url}/user/${testUser.id}/edit?_tk=${code}`, {
+        method: 'PUT',
+        headers,
+        body: "name=test&pwd=test"
+      })
+        .then((res) => {
+          assert.strictEqual(res.status, 403);
+          return res.json();
+        })
+        .then((res) => {
+          assert.strictEqual(res.code, 403);
           done();
         })
     })

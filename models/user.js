@@ -54,13 +54,17 @@ exports.login = async (name, password) => {
   mysql.release(conn);
   return user;
 }
-exports.edit = async (id, password) => {
+exports.edit = async (id, password, oldPassword) => {
   let conn;
   let result = false;
-  if (!id || typeof id !== 'number' || !password) return false;
+  if (!id || typeof id !== 'number' || !password || password === oldPassword) return false;
   try {
     conn = await mysql.connect();
-    const res = await mysql.query('update ' + tableName + ' set `password`=? where `id`=? limit 1', conn, [createPassword(password, id), id]);
+    const res = await mysql.query('update ' + tableName + ' set `password`=? where `id`=? && `password`=? limit 1', conn, [
+      createPassword(password, id),
+      id,
+      createPassword(oldPassword, id)
+    ]);
     result = !!(res && res.changedRows === 1);
   } catch (e) {
     logger.info(`edit:${id} - ${e.message}`);

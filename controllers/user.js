@@ -124,10 +124,14 @@ exports.edit = async (req, res) => {
   }
   try {
     const password = req.body.pwd ? req.body.pwd.trim() : '';
+    const oldPassword = req.body.oldpwd ? req.body.oldpwd.trim() : '';
+    if (!oldPassword) {
+      throw new Error('no old password');
+    }
     if (!password) {
       throw new Error('no password');
     }
-    result = await user.edit(uid, password);
+    result = await user.edit(uid, password, oldPassword);
   } catch (e) {
     code = 1;
     msg = e.message ? e.message : 'edit error';
