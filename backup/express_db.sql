@@ -34,7 +34,6 @@ CREATE TABLE `user` (
   `nick` varchar(100) NOT NULL COMMENT '昵称',
   `email` varchar(100) NOT NULL DEFAULT '' COMMENT '邮箱',
   `create_time` datetime NOT NULL DEFAULT '2018-02-18 00:00:00' COMMENT '注册时间',
-  `login_time` datetime NOT NULL DEFAULT '2018-02-18 00:00:00' COMMENT '登录时间',
   `update_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户';
 
@@ -42,9 +41,9 @@ CREATE TABLE `user` (
 -- 转存表中的数据 `user`
 --
 
-INSERT INTO `user` (`id`, `name`, `password`, `nick`, `email`, `create_time`, `login_time`, `update_time`) VALUES
-(999, 'test', '93327f2856df1105a1318895ac44e684', 'dGVzdA==', 'test@c.gb', '2018-02-18 00:00:00', '2018-02-18 00:00:00', '2021-04-23 05:54:38'),
-(1000, 'admin', '8d54d2587e4e23acd4aebaabcf8665ee3', '566h55CG5ZGY', '48838096@qq.com', '2016-03-25 10:31:28', '2017-06-26 01:42:47', '2017-06-25 01:42:47');
+INSERT INTO `user` (`id`, `name`, `password`, `nick`, `email`, `create_time`, `update_time`) VALUES
+(999, 'test', '93327f2856df1105a1318895ac44e684', 'dGVzdA==', 'test@c.gb', '2018-02-18 00:00:00', '2021-04-23 05:54:38'),
+(1000, 'admin', '2d830dff98f20e9bde2b44616c87e5ab', '566h55CG5ZGY', '48838096@qq.com', '2016-03-25 10:31:28', '2017-06-25 01:42:47');
 
 --
 -- 转储表的索引

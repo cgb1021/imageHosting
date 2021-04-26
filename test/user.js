@@ -2,6 +2,7 @@ const assert = require('chai').assert;
 const fetch = require("node-fetch");
 const token = require('../utils/token');
 const user = require('../models/user');
+const cookie = require('../utils/cookie');
 const url = 'http://localhost:3001';
 const headers = {
   "Content-Type": "application/x-www-form-urlencoded"
@@ -10,32 +11,50 @@ const testUser = {
   id: 999,
   name: 'test'
 }
-
+const testLoginSuccess = (step, cookies, res, name) => {
+  if (step) {
+    // 步骤2
+    assert.strictEqual(res.code, 0);
+    assert.isString(res.token);
+    assert.strictEqual(res.token, cookies.u_tk.value);
+    assert.isObject(res.user);
+    assert.strictEqual(res.user.name, name);
+    assert.strictEqual(cookies.u_name.value, name);
+    assert.equal(res.user.id, cookies.u_id.value);
+  } else {
+    assert.strictEqual(res.status, 200);
+    const hasUToken = typeof cookies['u_tk'] !== 'undefined';
+    const hasUId = typeof cookies['u_id'] !== 'undefined';
+    const hasUName = typeof cookies['u_name'] !== 'undefined';
+    const hasNick = typeof cookies['u_nick'] !== 'undefined';
+    assert.isTrue(hasUToken);
+    assert.isTrue(hasUName);
+    assert.isTrue(hasUId);
+    assert.isTrue(hasNick);
+    assert.strictEqual(cookies['u_tk'].expires, cookies['u_id'].expires);
+    const days = Math.ceil((new Date(cookies['u_id'].expires) - new Date()) / (24 * 3600 * 1000));
+    assert.isAtLeast(days, 7);
+    assert.isAtMost(days, 14);
+  }
+}
 describe('User', function() {
   describe('#signin', function() {
     it('正常登录', function(done) {
       const code = token.create();
-      fetch(`${url}/user/login?_tk=${code}`, {
+      let cookies, expires = 7 * 24 * 3600;
+      fetch(`${url}/user/login?_tk=${code}&expires=${expires}`, {
         method: 'POST',
         headers,
         body: "name=test&pwd=test"
       })
         .then((res) => {
           const cookieStr = res.headers.get('set-cookie');
-          const hasUToken = /\bu_tk=\w{36}[^,]+?Expires=[^,]+?,[^,]+?HttpOnly,/.test(cookieStr);
-          const hasUId = /\bu_id=\d{3,}[^,]+?Expires=[^,]+?,[^,]+?HttpOnly,/.test(cookieStr);
-          const hasUName = /\bu_name=\w+/.test(cookieStr);
-          assert.isTrue(hasUToken);
-          assert.isTrue(hasUName);
-          assert.isTrue(hasUId);
-          assert.strictEqual(res.status, 200);
+          cookies = cookie.parse(cookieStr);
+          testLoginSuccess(0, cookies, res);
           return res.json();
         })
         .then((res) => {
-          assert.strictEqual(res.code, 0);
-          assert.isString(res.token);
-          assert.isObject(res.user);
-          assert.strictEqual(res.user.name, 'test');
+          testLoginSuccess(1, cookies, res, 'test');
           done();
         })
     })
@@ -172,26 +191,20 @@ describe('User', function() {
   describe('#signup', function() {
     it('正常注册', function(done) {
       const code = token.create();
+      const name = `test${Math.floor(Date.now() / 1000)}`;
       fetch(`${url}/user/reg?_tk=${code}`, {
         method: 'POST',
         headers,
-        body: `name=test${Math.floor(Date.now() / 1000)}&pwd=test`
+        body: `name=${name}&pwd=test`
       })
         .then((res) => {
           const cookieStr = res.headers.get('set-cookie');
-          const hasUToken = /\bu_tk=\w{36}[^,]+?Expires=[^,]+?,[^,]+?HttpOnly,/.test(cookieStr);
-          const hasUId = /\bu_id=\d{3,}[^,]+?Expires=[^,]+?,[^,]+?HttpOnly,/.test(cookieStr);
-          const hasUName = /\bu_name=\w+/.test(cookieStr);
-          assert.isTrue(hasUToken);
-          assert.isTrue(hasUName);
-          assert.isTrue(hasUId);
-          assert.strictEqual(res.status, 200);
+          cookies = cookie.parse(cookieStr);
+          testLoginSuccess(0, cookies, res);
           return res.json();
         })
         .then((res) => {
-          assert.strictEqual(res.code, 0);
-          assert.isString(res.token);
-          assert.isObject(res.user);
+          testLoginSuccess(1, cookies, res, name);
           done();
         })
     })
@@ -250,13 +263,14 @@ describe('User', function() {
         .then((res) => {
           assert.strictEqual(res.status, 200);
           const cookieStr = res.headers.get('set-cookie');
-          const hasUId = /\bu_id=[^,]+?Expires=[^,]+?,[^,]+?HttpOnly/.test(cookieStr);
-          const hasUToken = /\bu_tk=[^,]+?Expires=[^,]+?,[^,]+?HttpOnly/.test(cookieStr);
-          const match = cookieStr.match(/Expires=([^;]+)/);
-          const time = new Date() - new Date(match[1]);
-          assert.strictEqual(Math.floor(time / (24 * 3600 * 1000)), 7);
+          const cookies = cookie.parse(cookieStr);
+          const hasUToken = typeof cookies['u_tk'] !== 'undefined';
+          const hasUId = typeof cookies['u_id'] !== 'undefined';
           assert.isTrue(hasUToken);
           assert.isTrue(hasUId);
+          const time = new Date() - new Date(cookies['u_id'].expires);
+          assert.strictEqual(cookies['u_tk'].expires, cookies['u_id'].expires);
+          assert.strictEqual(Math.floor(time / (24 * 3600 * 1000)), 7);
           return res.json();
         })
         .then((res) => {

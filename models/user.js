@@ -16,7 +16,7 @@ exports.create = async (info) => {
   if (info && info.name && info.password) {
     try {
       conn = await mysql.connect();
-      const res = await mysql.query('insert into ' + tableName + ' (`name`,`password`,`email`,`nick`,`create_time`,`login_time`) values (?,?,?,?,now(),now())', conn, [
+      const res = await mysql.query('insert into ' + tableName + ' (`name`,`password`,`email`,`nick`,`create_time`) values (?,?,?,?,now())', conn, [
         info.name,
         info.password,
         info.email,
@@ -41,8 +41,7 @@ exports.login = async (name, password) => {
     conn = await mysql.connect();
     const res = await mysql.query('select `id`,`name`,`password`,`nick` from ' + tableName + ' where `name`=? limit 1', conn, name);
     if (res.length && res[0].password && createPassword(password, res[0].id) === res[0].password) {
-      const id = res[0].id;
-      await mysql.query('update ' + tableName + ' set `login_time`=now() where `id`=' + id + ' limit 1', conn);
+      const id = +res[0].id;
       user = {
         id,
         name: res[0].name,
@@ -58,7 +57,7 @@ exports.login = async (name, password) => {
 exports.edit = async (id, password) => {
   let conn;
   let result = false;
-  if (!id || !password) return false;
+  if (!id || typeof id !== 'number' || !password) return false;
   try {
     conn = await mysql.connect();
     const res = await mysql.query('update ' + tableName + ' set `password`=? where `id`=? limit 1', conn, [createPassword(password, id), id]);
